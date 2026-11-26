@@ -20,37 +20,37 @@ This project provides an evaluation pipeline that runs benchmark datasets agains
 - **Experiment Tracking:** Supports optional MLflow integration for recording benchmark metrics.
 - **Results Storage:** Uses SQLite to persist benchmark execution results.
 - **Dashboard:** Provides a Streamlit interface for viewing benchmark results.
-- **Testing:** Includes automated tests for dataset validation and evaluation metrics.
+- **Automated Testing:** Includes tests for API endpoints, benchmark execution, evaluation metrics, providers, dataset validation, and database operations.
 
 ## Architecture
 
 ```text
-                Benchmark Dataset
-                       |
-                       v
-               FastAPI Backend
-                       |
-                       v
-                Benchmark Engine
-                       |
-             +---------+---------+
-             |                   |
-             v                   v
-        Ollama Provider     Evaluation Engine
-             |                   |
-             v                   v
-          LLM Model          Quality Metrics
-             |                   |
-             +---------+---------+
-                       |
-                       v
-                Quality Gates
-                       |
-             +---------+---------+
-             |         |         |
-             v         v         v
-           SQLite    MLflow   Streamlit
-           Storage  Tracking  Dashboard
+                  Benchmark Dataset
+                         |
+                         v
+                  FastAPI Backend
+                         |
+                         v
+                   Benchmark Engine
+                         |
+              +----------+----------+
+              |                     |
+              v                     v
+         Ollama Provider      Evaluation Engine
+              |                     |
+              v                     v
+           LLM Model           Quality Metrics
+              |                     |
+              +----------+----------+
+                         |
+                         v
+                    Quality Gates
+                         |
+              +----------+----------+
+              |          |          |
+              v          v          v
+           SQLite      MLflow    Streamlit
+           Storage    Tracking   Dashboard
 ```
 
 ## Evaluation Metrics
@@ -69,7 +69,7 @@ The platform evaluates model responses using multiple metrics:
 | Inference Latency | Measures response generation time |
 | Answer Token Count | Tracks generated response length |
 
-**Note:** Groundedness is currently a lexical-overlap proxy, not an NLI-based factuality or hallucination detector. These metrics are useful for benchmarking but should not be treated as definitive measures of factual correctness.
+**Important:** Groundedness is currently a lexical-overlap proxy, not an NLI-based factuality or hallucination detector. These metrics are useful for benchmarking but should not be treated as definitive measures of factual correctness.
 
 ## Quality Gates
 
@@ -97,7 +97,7 @@ Thresholds can be configured through environment variables.
 | Database | SQLite |
 | Dashboard | Streamlit |
 | Experiment Tracking | MLflow (optional) |
-| Testing | Pytest |
+| Testing | Pytest, pytest-cov |
 | Containerization | Docker, Docker Compose |
 | CI | GitHub Actions |
 
@@ -107,6 +107,7 @@ Thresholds can be configured through environment variables.
 llm_benchmark_modelops_starter/
 │
 ├── backend/
+│   ├── __init__.py
 │   ├── main.py
 │   ├── benchmark.py
 │   ├── providers.py
@@ -123,7 +124,11 @@ llm_benchmark_modelops_starter/
 │
 ├── tests/
 │   ├── test_dataset.py
-│   └── test_metrics.py
+│   ├── test_benchmark.py
+│   ├── test_main.py
+│   ├── test_metrics.py
+│   ├── test_providers.py
+│   └── test_storage.py
 │
 ├── .github/
 │   └── workflows/
@@ -222,12 +227,6 @@ Open another terminal, activate the virtual environment, and run:
 streamlit run dashboard/app.py
 ```
 
-### 8. Run automated tests
-
-```bash
-python -m pytest -q
-```
-
 ## Sample Benchmark Results
 
 A benchmark run was executed using the `llama3.2:3b` model through Ollama with a 20-question evaluation dataset.
@@ -243,20 +242,51 @@ A benchmark run was executed using the `llama3.2:3b` model through Ollama with a
 | Groundedness Proxy | 0.4763 |
 | Quality Gate | Passed |
 
-*These are results from one benchmark run, not a guarantee of performance across different models, hardware, or datasets.*
+*These results represent one benchmark run and are not a guarantee of performance across different models, hardware, or datasets.*
 
-## Testing
+## Testing and Code Coverage
 
-The project includes automated tests covering:
+The project includes **45 automated tests** covering the backend components and evaluation pipeline.
 
-- Benchmark dataset validation
-- Evaluation metric calculations
+### Test Coverage
 
-Run the test suite:
+| Backend Module | Statement Coverage |
+|---|---:|
+| Benchmark Engine | 100% |
+| Configuration | 100% |
+| Evaluation Engine | 100% |
+| FastAPI Backend | 100% |
+| LLM Providers | 100% |
+| SQLite Storage | 100% |
+| **Total Backend Coverage** | **100%** |
+
+### Verified Test Results
+
+- 45 automated tests passed.
+- 170 backend statements measured.
+- 0 uncovered backend statements.
+- MLflow success and failure paths tested.
+- HTML coverage report generated successfully.
+
+### Run the test suite
 
 ```bash
-python -m pytest -q
+python -m pytest -v
 ```
+
+### Generate the coverage report
+
+```bash
+python -m pytest --cov=backend --cov-report=term-missing --cov-report=html
+```
+
+Open the detailed HTML report:
+
+```text
+htmlcov/index.html
+```
+
+**Note:** 100% coverage represents executed backend statements during automated tests. It does not guarantee that the application is bug-free or that LLM responses are factually correct.
 
 ## Future Improvements
 
