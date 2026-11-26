@@ -1,0 +1,3 @@
+{"id": "case-01", "question": "Define retrieval-augmented generation.", "context": "RAG retrieves relevant external material and supplies it to an LLM to help generate an answer.", "reference_answer": "RAG combines retrieval of relevant information with language-model generation."}
+{"id": "case-02", "question": "Why can RAG help ground answers?", "context": "Retrieved sources provide evidence and context for a response.", "reference_answer": "RAG provides external evidence that can reduce unsupported claims."}
+{"id": "case-03", "question": "What is an embedding?", "context": "A vector representation of content that captures useful semantic relationships.", "reference_answer": "An embedding maps content to a numeric vector representation."}
